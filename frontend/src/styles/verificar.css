@@ -1,0 +1,331 @@
+/* ═══════════════════════════════════════════════════════════════════
+   VERIFICAR VIEW — Spline hero + panel scroll
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Contenedor raíz: scroll normal de página */
+.vcert-root {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Sección Hero ── */
+.vcert-hero {
+    position: relative;
+    height: calc(100dvh - 58px);   /* viewport completo menos el header */
+    min-height: 560px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Sistema de capas del hero:
+   z0: GSAP ScrollTrigger Frame Sequence
+   z1: degradados CSS — pointer-events:none, puramente visuales
+   z2: texto          — pointer-events:auto solo sobre los elementos de texto/botones
+   ── */
+
+.vcert-scroll-bg {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Overlay de contraste: ligero, sin bloquear eventos */
+.vcert-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: rgba(4, 4, 5, 0.22);
+}
+
+/* Contenido textual: z-index alto, pointer-events solo en sus hijos interactivos */
+/* Contenido textual: enmarcado en tarjeta de cristal cibernética (Glassmorphism) */
+.vcert-hero-content {
+    position: relative;
+    z-index: 3;
+    max-width: 640px;
+    padding: clamp(1.8rem, 4vw, 2.5rem);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1rem, 2.5vh, 1.6rem);
+    background: rgba(5, 7, 10, 0.78);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(77, 216, 255, 0.25);
+    border-radius: var(--r-xl);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    /* El contenido NO bloquea el ratón salvo en botones/texto propio */
+    pointer-events: none;
+}
+/* Solo los elementos interactivos del contenido capturan eventos */
+.vcert-hero-content button,
+.vcert-hero-content a,
+.vcert-hero-content label {
+    pointer-events: auto;
+}
+
+/* Eyebrow */
+.vcert-hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.55rem;
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--electric);
+    padding: 0.38rem 0.9rem;
+    border: 1px solid rgba(77, 216, 255, 0.35);
+    border-radius: var(--r-pill);
+    background: rgba(77, 216, 255, 0.12);
+    backdrop-filter: blur(8px);
+}
+.vcert-eyebrow-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--electric);
+    box-shadow: 0 0 8px var(--electric);
+    animation: pulse-dot 1.8s ease infinite;
+    flex-shrink: 0;
+}
+
+/* Título */
+.vcert-hero-title {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    line-height: 1.1; letter-spacing: -0.03em;
+    color: #ffffff; margin: 0;
+    text-shadow: 0 0 30px rgba(0,0,0,0.9);
+}
+.vcert-title-accent {
+    color: var(--electric);
+    text-shadow: 0 0 30px rgba(77, 216, 255, 0.6);
+}
+
+/* Cuerpo */
+.vcert-hero-body {
+    font-size: clamp(0.92rem, 1.6vw, 1.08rem);
+    line-height: 1.75; color: #e2e8f0;
+    font-weight: 450;
+    max-width: 48ch;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.95);
+}
+
+/* Pills con características */
+.vcert-hero-pills {
+    list-style: none;
+    display: flex; flex-wrap: wrap; gap: 0.55rem;
+    justify-content: center;
+    padding: 0; margin: 0;
+}
+.vcert-pill {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #ffffff;
+    padding: 0.4rem 0.85rem;
+    background: rgba(15, 23, 30, 0.85);
+    border: 1px solid rgba(77, 216, 255, 0.3);
+    border-radius: var(--r-pill);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: color var(--t-base), border-color var(--t-base), background var(--t-base);
+}
+.vcert-pill svg { color: var(--electric); flex-shrink: 0; }
+.vcert-pill:hover { color: var(--text-signal); border-color: var(--electric); background: rgba(77, 216, 255, 0.15); }
+
+/* Scroll hint */
+.vcert-scroll-hint {
+    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+    background: rgba(10, 15, 22, 0.85);
+    border: 1px solid rgba(77, 216, 255, 0.35);
+    border-radius: var(--r-pill);
+    cursor: pointer; color: #ffffff;
+    padding: 0.55rem 1.3rem; margin-top: 0.5rem;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    transition: all var(--t-base);
+}
+.vcert-scroll-hint:hover { color: var(--electric); border-color: var(--electric); box-shadow: 0 0 20px rgba(77,216,255,0.4); }
+.vcert-scroll-label {
+    font-family: var(--font-mono); font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.14em;
+}
+.vcert-scroll-arrow {
+    animation: vcert-bounce 2s ease-in-out infinite;
+}
+@keyframes vcert-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(6px); }
+}
+
+/* ── Sección Verificador ── */
+.vcert-verify-section {
+    background: transparent;
+    padding: clamp(3rem, 8vh, 5rem) 0 clamp(3rem, 8vh, 5rem);
+    border-top: 1px solid rgba(77, 216, 255, 0.12);
+    position: relative;
+    z-index: 2;
+}
+
+
+/* ═══ VerificarPanel — Verificación de Certificado ═════════════════ */
+.verificar-panel {
+    display: flex; flex-direction: column; gap: 1.4rem;
+    animation: view-in var(--t-slow) var(--ease-out);
+}
+
+/* Cabecera con botón volver */
+.verificar-head {
+    display: flex; flex-direction: column; gap: 1rem;
+}
+.btn-back {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: none; border: 1px solid var(--border); border-radius: var(--r-md);
+    color: var(--text-dim); cursor: pointer;
+    font-family: var(--font-mono); font-size: 0.74rem; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 0.45rem 0.85rem;
+    align-self: flex-start;
+    transition: color var(--t-base), border-color var(--t-base), background var(--t-base);
+}
+.btn-back:hover { color: var(--text-signal); border-color: var(--border-strong); background: var(--bg-elevated); }
+.btn-back svg { flex-shrink: 0; }
+
+.verificar-title-wrap { display: flex; flex-direction: column; gap: 0.25rem; }
+.verificar-eyebrow {
+    font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--electric);
+}
+.verificar-title {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(1.6rem, 5vw, 2.4rem); letter-spacing: -0.02em;
+    color: #ffffff; margin: 0;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+}
+.verificar-desc { color: #f8fafc; font-size: 0.95rem; text-shadow: 0 1px 6px rgba(0,0,0,0.8); }
+
+/* Zona de drop/textarea */
+.verificar-dropzone {
+    background: rgba(8, 12, 16, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(77, 216, 255, 0.25);
+    border-radius: var(--r-lg); overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    transition: border-color var(--t-base), box-shadow var(--t-base);
+}
+.verificar-dropzone:focus-within {
+    border-color: var(--electric);
+    box-shadow: 0 0 20px rgba(77, 216, 255, 0.2);
+}
+.verificar-dropzone.is-dragging {
+    border-color: var(--electric);
+    box-shadow: 0 0 30px rgba(77,216,255,0.3);
+}
+
+.verificar-field-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.65rem 1rem;
+    background: rgba(77,216,255,0.08);
+    border-bottom: 1px solid rgba(77,216,255,0.2);
+}
+.verificar-field-label {
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--electric);
+}
+
+.btn-file-upload {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #ffffff; cursor: pointer;
+    padding: 0.3rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--r-sm);
+    transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
+}
+.btn-file-upload:hover { color: #ffffff; border-color: var(--electric); background: rgba(77, 216, 255, 0.2); }
+
+.verificar-textarea {
+    width: 100%; background: transparent !important;
+    border: none !important; border-radius: 0 !important;
+    outline: none; resize: none;
+    font-family: var(--font-mono) !important; font-size: 0.8rem !important;
+    line-height: 1.7; color: #ffffff !important;
+    padding: 1rem !important;
+    min-height: 200px;
+}
+.verificar-textarea::placeholder { color: rgba(255, 255, 255, 0.65); }
+
+.verificar-drop-overlay {
+    position: absolute; inset: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(77,216,255,0.06);
+    font-family: var(--font-mono); font-size: 0.88rem; color: var(--electric);
+    pointer-events: none;
+}
+
+.btn-verificar-submit { width: 100%; }
+
+/* Resultado de verificación */
+.verificar-result {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1.1rem 1.3rem; border-radius: var(--r-lg);
+    border: 1px solid var(--border);
+    animation: freeze-in var(--t-base) var(--ease-out);
+}
+.verificar-result.is-valid {
+    background: var(--valid-bg, rgba(52,211,153,0.07));
+    border-color: rgba(52,211,153,0.3);
+}
+.verificar-result.is-invalid {
+    background: var(--signal-red-bg);
+    border-color: var(--signal-red-brd);
+}
+.verificar-result.is-error {
+    background: var(--signal-red-bg);
+    border-color: var(--signal-red-brd);
+}
+
+.vr-icon {
+    flex-shrink: 0; margin-top: 2px;
+    display: flex; align-items: center;
+}
+.is-valid   .vr-icon { color: var(--valid); }
+.is-invalid .vr-icon, .is-error .vr-icon { color: var(--signal-red); }
+
+.vr-status {
+    font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.25rem;
+}
+.is-valid   .vr-status { color: var(--valid); }
+.is-invalid .vr-status, .is-error .vr-status { color: var(--signal-red); }
+
+.vr-msg {
+    font-size: 0.85rem; color: var(--text-dim); line-height: 1.6;
+}
+
+/* btn-ghost con icono */
+.btn-ghost { display: inline-flex; align-items: center; gap: 0.45rem; }
+.btn-ghost svg { flex-shrink: 0; }
+
+/* Dropzone / CertificadoCard legacy (lab) */
+.dropzone-container { position: relative; }
+.dropzone-container.is-dragging textarea { opacity: 0.4; }
+.dropzone-overlay {
+    position: absolute; inset: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(77,216,255,0.08); border: 2px dashed var(--electric);
+    border-radius: var(--r-md); font-family: var(--font-mono); font-size: 0.9rem; color: var(--electric);
+    pointer-events: none;
+}
+.file-upload-btn {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-dim);
+    cursor: pointer; padding: 0.2rem 0.5rem; border: 1px solid var(--border);
+    border-radius: var(--r-sm); background: var(--bg-elevated); margin-left: 0.6rem;
+    transition: color var(--t-fast), border-color var(--t-fast);
+}
+.file-upload-btn:hover { color: var(--electric); border-color: var(--electric-brd); }
+
+
