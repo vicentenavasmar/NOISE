@@ -1,1 +1,15 @@
+/* ═══════════════════════════════════════════════════════════════════
+   RUIDO — Hoja de estilos raíz.
 
+   El CSS se reparte en parciales por área dentro de ./styles/.
+   Se importan EN ESTE ORDEN para preservar exactamente la cascada
+   original; no reordenar sin revisar las precedencias.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@import "./styles/base.css";        /* tokens :root, reset, base, scrollbar     */
+@import "./styles/effects.css";     /* frame sequence, glitch field, CRT, glitch */
+@import "./styles/hero.css";        /* header, main/views, hero, pantalla inicial */
+@import "./styles/stage.css";       /* stage, resultado/obra + certificado        */
+@import "./styles/verificar.css";   /* Verificar view + VerificarPanel            */
+@import "./styles/responsive.css";  /* footer, responsive, prefers-reduced-motion */
+@import "./styles/crt-testigo.css"; /* sala de control CRT — mejoras Modo Testigo  */
