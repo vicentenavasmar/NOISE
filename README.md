@@ -247,6 +247,8 @@ cp .env.example .env      # fill in your credentials
 uvicorn app.main:app --reload --port 8000
 ```
 
+> *You should rename de .env.expample to .env with your credentials*
+> 
 `.env`:
 
 ```env
