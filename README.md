@@ -30,8 +30,7 @@ It's defined by **the exact instant you shut the machine down.**
 
 **Built by [Vicente Navas Martínez](https://linkedin.com/in/vicente-navas-martinez-aa8ba63b4) · [Daniel Claver Feito](https://linkedin.com/in/daniel-claver-feito-b34043264/)**
 
-<!-- TODO: replace with the final links -->
-[**Demo video (3 min)**](#)
+[**Demo video (3 min)**](https://www.youtube.com/watch?v=B-QsKg0smIk)
 
 </div>
 
